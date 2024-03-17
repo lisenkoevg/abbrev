@@ -1,6 +1,7 @@
 import os
+import sys
 
-lines = open('pdf/abbr.txt', encoding='utf8').readlines()[30:40]
+lines = open('samples/abbr.txt', encoding='utf8').readlines()[30:40]
 
 def vowelize(x):
   chars1 = 'БВГДПТ'
@@ -24,8 +25,11 @@ def f1(x):
   return f'{line.strip()}\n'
 
 lines = list(map(f1, lines))
-ssml_text = ''.join(lines).strip()
-ssml_text = f'<speak><prosody rate="fast">\n{ssml_text}\n</prosody></speak>'
+# ssml_text = ''.join(lines).strip()
+
+# ssml_text = open('samples/sample.txt', encoding='utf8').read()[0:int(sys.argv[1])]
+ssml_text = 'Событие произошло 11 января 2020 года.'
+ssml_text = f'<speak><prosody rate="x-fast">\n{ssml_text}\n</prosody></speak>'
 print(ssml_text)
 # exit(1)
 
@@ -33,7 +37,7 @@ import torch
 
 device = torch.device('cpu')
 torch.set_num_threads(4)
-local_file = 'model.pt'
+local_file = 'tmp/model.pt'
 
 if not os.path.isfile(local_file):
     torch.hub.download_url_to_file('https://models.silero.ai/models/tts/ru/v4_ru.pt',
@@ -45,4 +49,5 @@ speaker='aidar'
 
 audio_paths = model.save_wav(ssml_text=ssml_text,
                              speaker=speaker,
+                             audio_path='tmp/test.wav',
                              sample_rate=sample_rate)
