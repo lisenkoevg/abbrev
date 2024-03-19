@@ -1,0 +1,42 @@
+Total letters: 22647845
+
+real	0m6.596s
+user	0m0.015s
+sys	0m0.030s
+Python test tests/kob.in ok
+========================================
+Total letters: 22726244
+
+real	0m5.192s
+user	0m0.000s
+sys	0m0.015s
+Python test tests/kob_cp1251.in ok
+========================================
+Total letters: 21508040
+
+real	0m1.408s
+user	0m0.000s
+sys	0m0.031s
+C test tests/kob_cp1251.in ok
+========================================
+Total letters: 589729
+
+real	0m0.280s
+user	0m0.045s
+sys	0m0.016s
+Python test tests/krasn_vesna.in ok
+========================================
+Total letters: 594360
+
+real	0m0.242s
+user	0m0.000s
+sys	0m0.000s
+Python test tests/krasn_vesna_cp1251.in ok
+========================================
+Total letters: 540973
+
+real	0m0.075s
+user	0m0.000s
+sys	0m0.030s
+C test tests/krasn_vesna_cp1251.in ok
+========================================

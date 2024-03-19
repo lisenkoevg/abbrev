@@ -1,19 +1,32 @@
 import sys
 import os
-import re
+import argparse
 
-inputFile = sys.argv[1]
-if not os.path.isfile(inputFile):
-  print(f'file {inputFile} not exists')
+from ruLetters import lowerLetters
+from ruLetters import upperLetters
+from ruLetters import lowerLettersCp1251
+from ruLetters import upperLettersCp1251
+from ruLetters import cp1251
+
+parser = argparse.ArgumentParser()
+parser.add_argument('filename')
+parser.add_argument('-c', '--count', help='process only first COUNT characters from file', type=int, default=None)
+parser.add_argument('-e', '--encoding', help='encoding of input file', choices=['utf8', 'cp1251'], default='utf8')
+args = parser.parse_args()
+
+if not os.path.isfile(args.filename):
+  print(f'file {args.filename} not exists')
   exit(1)
 
-content = open(inputFile, encoding='utf8').read()[0:int(sys.argv[2])]
+mode = 'r' if args.encoding == 'utf8' else 'rb'
+content = open(args.filename, mode=mode, encoding=args.encoding if args.encoding == 'utf8' else None).read()[0:args.count]
 
-lowerLetters = set(range(ord('а'), ord('я') + 1)) | { ord('ё') }
-lowerLetters = set(map((lambda x: chr(x)), lowerLetters))
-upperLetters = set(range(ord('А'), ord('Я') + 1)) | { ord('Ё') }
-upperLetters = set(map((lambda x: chr(x)), upperLetters))
-letters = lowerLetters | upperLetters
+if args.encoding == 'utf8':
+  letters = lowerLetters | upperLetters
+  up = upperLetters
+if args.encoding == 'cp1251':
+  letters = lowerLettersCp1251 | upperLettersCp1251
+  up = upperLettersCp1251
 
 abbreviations = set()
 
@@ -22,22 +35,28 @@ def isAbbr(upperLetterCount, length):
   else: return upperLetterCount >= (length - 2)
 
 counter = 0
-upperLetterCounter = 0
+upperLettersCounter = 0
 curWord = []
 for ch in content:
   counter += 1
   code = ch
   if code in letters:
-    if code in upperLetters: upperLetterCounter += 1
-    curWord += ch
+    if code in up: upperLettersCounter += 1
+    curWord.append(ch)
   else:
-    if upperLetterCounter >= 2 and isAbbr(upperLetterCounter, len(curWord)):
+    if upperLettersCounter >= 2 and isAbbr(upperLettersCounter, len(curWord)):
+      if args.encoding == 'utf8':
         abbreviations.add(''.join(curWord))
+      else:
+        abbreviations.add(bytes(curWord))
     curWord = []
-    upperLetterCounter = 0
+    upperLettersCounter = 0
 
-# print(f'Total letters: {counter}')
-lst = list(abbreviations)
+sys.stderr.write(f'Total letters: {counter}\n')
+if args.encoding == 'utf8':
+  lst = list(abbreviations)
+else:
+  lst = list(map((lambda x: cp1251.decode(x)[0]), abbreviations)) 
+
 lst.sort()
 print('\n'.join(lst))
-
