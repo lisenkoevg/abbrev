@@ -3,5 +3,5 @@ tmp
 *.wav
 model.pt
 __pycache__
-kob*.in
-kob*.out
+kob*.*
+kurginyan.*

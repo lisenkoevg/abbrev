@@ -1,6 +1,7 @@
 #!/bin/bash
 
 RC=
+make -sB -C c CFLAGS=-s
 for testInput in tests/*.in; do
   echo $testInput | grep -qF "/." && continue
   testOutput=${testInput%.*}.out
@@ -9,7 +10,7 @@ for testInput in tests/*.in; do
   enc=${cp1251:+--encoding cp1251}
   iconv="${enc:-| iconv -f CP1251 -t UTF-8}"
 
-  time eval py extractAbbr.py $testInput $enc $iconv > $testActual
+  time eval py extractAbbr.py $testInput $enc $iconv | dos2unix > $testActual
   diff -qN $testOutput $testActual && {
     echo Python test $testInput ok
     rm -f $testActual
@@ -20,7 +21,7 @@ for testInput in tests/*.in; do
   py -c 'print("=" * 40)'
 
   [ -n "$enc" ] && {
-    time eval './c/extractAbbr.exe < '$testInput'| sort -u > '${testActual}_c
+    time eval './c/extractAbbr.exe < '$testInput'| sort -u | dos2unix > '${testActual}_c
     diff -qN $testOutput ${testActual}_c && {
       echo C test $testInput ok
       rm -f ${testActual}_c
@@ -31,4 +32,5 @@ for testInput in tests/*.in; do
     py -c 'print("=" * 40)'
   }
 done
+make -s -C c clean
 [ -z "$RC" ] && nircmd beep 3000 50

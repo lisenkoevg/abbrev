@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "types.h"
 
 #define LETTERS_COUNT 33
 #define ALL_LETTERS_COUNT (LETTERS_COUNT + LETTERS_COUNT)
@@ -10,9 +11,6 @@
 
 #define PATH_DELIMITER_WIN '\\'
 #define PATH_DELIMITER_LINUX '/'
-
-typedef unsigned int uint;
-typedef unsigned char uchar;
 
 uchar lowerLetters[LETTERS_COUNT];
 uchar upperLetters[LETTERS_COUNT];
@@ -44,6 +42,7 @@ int main(int argc, char **argv) {
   uchar ch;
   uchar currentWord[MAX_WORD_LENGTH];
   while ((chInt = getchar()) != EOF) {
+    i++;
     ch = (uchar)chInt;
     if (inArray(ch, allLetters, ALL_LETTERS_COUNT)) {
       currentWord[currentWordLength++] = ch;
@@ -59,7 +58,6 @@ int main(int argc, char **argv) {
       }
       currentWordLength = upperLetterCounter = 0;
     }
-    i++;
     if (count > 0 && i == count)
       break;
   }
