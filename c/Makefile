@@ -6,8 +6,7 @@ excludeWarn = -Wsuggest-attribute=noreturn -Wsuggest-attribute=const -Wstrict-pr
 override CFLAGS += -g -Wextra -Wall -Wpedantic -Werror $(filter-out $(excludeWarn), $(warn)) 
 all: $(objects) $(tests)
 
-linkedList_test: linkedList_test.c linkedList.c
-	$(CC) $(CFLAGS) $^ -o $@
+extractAbbr linkedList_test: linkedList.c
 
 %: %.c
 	$(CC) $(CFLAGS) $^ -o $@

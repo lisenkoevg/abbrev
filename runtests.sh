@@ -21,7 +21,7 @@ for testInput in tests/*.in; do
   py -c 'print("=" * 40)'
 
   [ -n "$enc" ] && {
-    time eval './c/extractAbbr.exe < '$testInput'| sort -u | dos2unix > '${testActual}_c
+    time eval './c/extractAbbr.exe < '$testInput'| dos2unix > '${testActual}_c
     diff -qN $testOutput ${testActual}_c && {
       echo C test $testInput ok
       rm -f ${testActual}_c

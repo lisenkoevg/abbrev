@@ -1,9 +1,10 @@
+#include "linkedList.h"
+#include "types.h"
 #include <assert.h>
 #include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "types.h"
 
 #define LETTERS_COUNT 33
 #define ALL_LETTERS_COUNT (LETTERS_COUNT + LETTERS_COUNT)
@@ -30,7 +31,6 @@ char *replaceBasename(char *buf, const char *path, const char *basename);
 
 int main(int argc, char **argv) {
   init(argv[0]);
-
   uint count = 0;
   if (argc > 1)
     count = (uint)atoi(argv[1]);
@@ -41,6 +41,8 @@ int main(int argc, char **argv) {
   int chInt;
   uchar ch;
   uchar currentWord[MAX_WORD_LENGTH];
+  ListNode abbrBase = {(void *)NULL, (void *)NULL};
+  const ListPtr abbrPtr = &abbrBase;
   while ((chInt = getchar()) != EOF) {
     i++;
     ch = (uchar)chInt;
@@ -54,13 +56,14 @@ int main(int argc, char **argv) {
       currentWord[currentWordLength] = '\0';
       if (currentWordLength > 1 &&
           isAbbrev(currentWordLength, upperLetterCounter)) {
-        printf("%s\n", currentWord);
+        addNodeSorted(abbrPtr, (char *)currentWord, 1);
       }
       currentWordLength = upperLetterCounter = 0;
     }
     if (count > 0 && i == count)
       break;
   }
+  printList(abbrPtr);
   fprintf(stderr, "Total letters: %u\n", i);
   return 0;
 }
@@ -84,7 +87,7 @@ void readArrayFromFile(const char *filename, uchar *arr, uint length) {
     fprintf(stderr, "error opening file '%s'\n", filename);
     abort();
   } else {
-//     printf("Opening file '%s': success\n", filename);
+    //     printf("Opening file '%s': success\n", filename);
   }
   uchar i = 0;
   uchar ch;
