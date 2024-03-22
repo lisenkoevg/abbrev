@@ -1,0 +1,101 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ALL_LETTERS_COUNT	c/extractAbbr.c	10;"	d	file:
+DELIM	c/linkedList_test.c	4;"	d	file:
+LETTERS_COUNT	c/extractAbbr.c	9;"	d	file:
+ListNode	c/linkedList.h	/^} ListNode;$/;"	t	typeref:struct:tnode
+ListPtr	c/linkedList.h	/^typedef struct tnode *ListPtr;$/;"	t	typeref:struct:tnode
+MAX_WORD_LENGTH	c/extractAbbr.c	11;"	d	file:
+PATH_DELIMITER_LINUX	c/extractAbbr.c	14;"	d	file:
+PATH_DELIMITER_WIN	c/extractAbbr.c	13;"	d	file:
+abbreviations	extractAbbr.py	/^abbreviations = set()$/;"	v
+addNode	c/linkedList.c	/^ListPtr addNode(ListPtr p, const char *word) {$/;"	f
+addNodeSorted	c/linkedList.c	/^ListPtr addNodeSorted(ListPtr base, const char *word, char unique) {$/;"	f
+allLetters	c/extractAbbr.c	/^uchar allLetters[ALL_LETTERS_COUNT];$/;"	v
+argparse	extractAbbr.py	/^import argparse$/;"	i
+argparse	main.py	/^import argparse$/;"	i
+args	extractAbbr.py	/^args = parser.parse_args()$/;"	v
+args	main.py	/^args = parser.parse_args()$/;"	v
+audio_path	main.py	/^                             audio_path='tmp\/test.wav',$/;"	v
+audio_paths	main.py	/^audio_paths = model.save_wav(ssml_text=ssml_text,$/;"	v
+cache	vowelizeAbbr.py	/^cache = {}$/;"	v
+code	extractAbbr.py	/^  code = ch$/;"	v
+codecs	ruEnc.py	/^import codecs$/;"	i
+concatArrays	c/extractAbbr.c	/^void concatArrays(uchar *dest, const uchar *src1, const uchar *src2,$/;"	f
+content	extractAbbr.py	/^content = open(args.filename, mode=mode, encoding=args.encoding if args.encoding == 'utf8' else None).read()[0:args.count]$/;"	v
+counter	extractAbbr.py	/^counter = 0$/;"	v
+cp1251	extractAbbr.py	/^from ruEnc import cp1251$/;"	i
+cp1251	ruEnc.py	/^cp1251 = codecs.lookup('cp1251')$/;"	v
+curWord	extractAbbr.py	/^    curWord = []$/;"	v
+curWord	extractAbbr.py	/^curWord = []$/;"	v
+device	main.py	/^device = torch.device('cpu')$/;"	v
+dumpList	c/linkedList.c	/^void dumpList(const ListPtr bp) {$/;"	f
+entag	main.py	/^def entag(x):$/;"	f
+excludeWarn	c/Makefile	/^excludeWarn = -Wsuggest-attribute=noreturn -Wsuggest-attribute=const -Wstrict-prototypes$/;"	m
+freeList	c/linkedList.c	/^void freeList(const ListPtr bp) {$/;"	f
+inArray	c/extractAbbr.c	/^uchar inArray(uchar c, const uchar *arr, uint length) {$/;"	f
+init	c/extractAbbr.c	/^void init(char *prog) {$/;"	f
+isAbbr	extractAbbr.py	/^from isAbbr import isAbbr$/;"	i
+isAbbr	isAbbr.py	/^def isAbbr(upperLetterCount, length):$/;"	f
+isAbbrev	c/extractAbbr.c	/^uchar isAbbrev(uint length, uint upperLettersCount) {$/;"	f
+letters	extractAbbr.py	/^  letters = lowerLetters | upperLetters$/;"	v
+letters	extractAbbr.py	/^  letters = lowerLettersCp1251 | upperLettersCp1251$/;"	v
+lines	main.py	/^lines = open(args.filename, encoding="utf8").readlines()[args.fromLine:args.toLine]$/;"	v
+local_file	main.py	/^local_file = 'tmp\/model.pt'$/;"	v
+lowerLetters	c/extractAbbr.c	/^uchar lowerLetters[LETTERS_COUNT];$/;"	v
+lowerLetters	extractAbbr.py	/^from ruEnc import lowerLetters$/;"	i
+lowerLetters	ruEnc.py	/^from ruLetters import lowerLetters$/;"	i
+lowerLetters	ruLetters.py	/^lowerLetters = set(map((lambda x: chr(x)), lowerLetters))$/;"	v
+lowerLetters	ruLetters.py	/^lowerLetters = set(range(ord('а'), ord('я') + 1)) | { ord('ё') }$/;"	v
+lowerLettersCp1251	extractAbbr.py	/^from ruEnc import lowerLettersCp1251$/;"	i
+lowerLettersCp1251	ruEnc.py	/^lowerLettersCp1251 = set() $/;"	v
+lst	extractAbbr.py	/^  lst = list(abbreviations)$/;"	v
+lst	extractAbbr.py	/^  lst = list(map((lambda x: cp1251.decode(x)[0]), abbreviations)) $/;"	v
+main	c/extractAbbr.c	/^int main(int argc, char **argv) {$/;"	f
+main	c/linkedList_test.c	/^int main() {$/;"	f
+model	main.py	/^model = torch.package.PackageImporter(local_file).load_pickle("tts_models", "model")$/;"	v
+morph	morph.py	/^morph = pymorphy3.MorphAnalyzer()$/;"	v
+next	c/linkedList.h	/^  ListPtr next;$/;"	m	struct:tnode
+objects	c/Makefile	/^objects = extractAbbr $/;"	m
+os	extractAbbr.py	/^import os$/;"	i
+os	main.py	/^import os$/;"	i
+parser	extractAbbr.py	/^parser = argparse.ArgumentParser()$/;"	v
+parser	main.py	/^parser = argparse.ArgumentParser()$/;"	v
+printArray	c/extractAbbr.c	/^void printArray(uchar *arr, uchar length) {$/;"	f
+printList	c/linkedList.c	/^void printList(const ListPtr bp) {$/;"	f
+pymorphy3	morph.py	/^import pymorphy3$/;"	i
+readArrayFromFile	c/extractAbbr.c	/^void readArrayFromFile(const char *filename, uchar *arr, uint length) {$/;"	f
+replaceBasename	c/extractAbbr.c	/^char *replaceBasename(char *buf, const char *path, const char *basename) {$/;"	f
+sample_rate	main.py	/^                             sample_rate=sample_rate)$/;"	v
+sample_rate	main.py	/^sample_rate = 48000$/;"	v
+speaker	main.py	/^                             speaker=speaker,$/;"	v
+speaker	main.py	/^speaker='xenia'$/;"	v
+sys	extractAbbr.py	/^import sys$/;"	i
+sys	main.py	/^import sys$/;"	i
+tests	c/Makefile	/^tests = linkedList_test$/;"	m
+tnode	c/linkedList.h	/^typedef struct tnode {$/;"	s
+torch	main.py	/^import torch$/;"	i
+txt	main.py	/^txt = ''.join(list(map(entag, lines))).strip()$/;"	v
+uchar	c/types.h	/^typedef unsigned char uchar;$/;"	t
+uint	c/types.h	/^typedef unsigned int uint;$/;"	t
+up	extractAbbr.py	/^  up = upperLetters$/;"	v
+up	extractAbbr.py	/^  up = upperLettersCp1251$/;"	v
+upperLetters	c/extractAbbr.c	/^uchar upperLetters[LETTERS_COUNT];$/;"	v
+upperLetters	extractAbbr.py	/^from ruEnc import upperLetters$/;"	i
+upperLetters	ruEnc.py	/^from ruLetters import upperLetters$/;"	i
+upperLetters	ruLetters.py	/^upperLetters = set(map((lambda x: chr(x)), upperLetters))$/;"	v
+upperLetters	ruLetters.py	/^upperLetters = set(range(ord('А'), ord('Я') + 1)) | { ord('Ё') }$/;"	v
+upperLettersCounter	extractAbbr.py	/^    upperLettersCounter = 0$/;"	v
+upperLettersCounter	extractAbbr.py	/^upperLettersCounter = 0$/;"	v
+upperLettersCp1251	extractAbbr.py	/^from ruEnc import upperLettersCp1251$/;"	i
+upperLettersCp1251	ruEnc.py	/^upperLettersCp1251 = set() $/;"	v
+utf8	ruEnc.py	/^utf8 = codecs.lookup('utf8')$/;"	v
+vovelizeAbbr	vowelizeAbbr.py	/^def vovelizeAbbr(word):$/;"	f
+vowelizeAbbr	main.py	/^from vowelizeAbbr import vowelizeAbbr$/;"	i
+vowelizeAbbrLetter	vowelizeAbbr.py	/^def vowelizeAbbrLetter(x):$/;"	f
+warn	c/Makefile	/^warn = $(shell grep -v \\# warn_config | tr \\\\n ' ')$/;"	m
+word	c/linkedList.h	/^  char *word;$/;"	m	struct:tnode

@@ -1,40 +1,32 @@
 import os
 import sys
+import argparse
+from vowelizeAbbr import vowelizeAbbr
 
-lines = open('samples/abbr.txt', encoding='utf8').readlines()[30:40]
+parser = argparse.ArgumentParser()
+parser.add_argument('filename')
+parser.add_argument('-f', '--fromLine', help='process only first LINES from file', type=int, default=0)
+parser.add_argument('-t', '--toLine', help='process only first LINES from file', type=int, default=None)
+parser.add_argument('-n', '--dryRun', help='only show generated xml', action='store_true')
+args = parser.parse_args()
 
-def vowelize(x):
-  chars1 = 'БВГДПТ'
-  chars2 = 'ЛМРСФ'
-  chars3 = 'К'
-  if chars1.find(x) >= 0:
-    return x + '+э'
-  elif chars2.find(x) >= 0:
-    return 'э' + x
-  elif chars3.find(x) >= 0:
-    return x + 'а'
-  else:
-    return x
+lines = open(args.filename, encoding="utf8").readlines()[args.fromLine:args.toLine]
 
-def f1(x):
+def entag(x):
   line = x.split('|')
-  line[0] = ''.join(list(map((lambda x: f'{vowelize(x)}'), line[0])))
+  line[0] = vowelizeAbbr(line[0])
   line[0] = '<s>' + line[0].strip() + '</s>'
-  line[1] = f'<prosody rate="x-fast">{line[1].strip()}</prosody>'
+  line[1] = f'{line[1].strip()}'
   line = ' '.join(line)
   return f'{line.strip()}\n'
 
-lines = list(map(f1, lines))
-# ssml_text = ''.join(lines).strip()
-
-# ssml_text = open('samples/sample.txt', encoding='utf8').read()[0:int(sys.argv[1])]
-ssml_text = 'Событие произошло 11 января 2020 года.'
-ssml_text = f'<speak><prosody rate="x-fast">\n{ssml_text}\n</prosody></speak>'
+txt = ''.join(list(map(entag, lines))).strip()
+ssml_text = f'<speak><prosody rate="fast">\n{txt}\n</prosody></speak>'
 print(ssml_text)
-# exit(1)
+print('{} lines'.format(len(lines)))
+if (args.dryRun): exit(0)
 
 import torch
-
 device = torch.device('cpu')
 torch.set_num_threads(4)
 local_file = 'tmp/model.pt'
@@ -45,7 +37,7 @@ if not os.path.isfile(local_file):
 model = torch.package.PackageImporter(local_file).load_pickle("tts_models", "model")
 model.to(device)
 sample_rate = 48000
-speaker='aidar'
+speaker='xenia'
 
 audio_paths = model.save_wav(ssml_text=ssml_text,
                              speaker=speaker,

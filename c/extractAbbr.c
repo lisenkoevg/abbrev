@@ -71,10 +71,10 @@ int main(int argc, char **argv) {
 void init(char *prog) {
   char buf[500];
 
-  replaceBasename(buf, prog, "lowerLetters");
+  replaceBasename(buf, prog, "lowerLetters_cp1251");
   readArrayFromFile(buf, lowerLetters, LETTERS_COUNT);
 
-  replaceBasename(buf, prog, "upperLetters");
+  replaceBasename(buf, prog, "upperLetters_cp1251");
   readArrayFromFile(buf, upperLetters, LETTERS_COUNT);
 
   concatArrays(allLetters, upperLetters, lowerLetters, LETTERS_COUNT);

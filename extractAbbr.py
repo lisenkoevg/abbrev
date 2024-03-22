@@ -2,11 +2,12 @@ import sys
 import os
 import argparse
 
-from ruLetters import lowerLetters
-from ruLetters import upperLetters
-from ruLetters import lowerLettersCp1251
-from ruLetters import upperLettersCp1251
-from ruLetters import cp1251
+from isAbbr import isAbbr
+from ruEnc import lowerLetters
+from ruEnc import upperLetters
+from ruEnc import lowerLettersCp1251
+from ruEnc import upperLettersCp1251
+from ruEnc import cp1251
 
 parser = argparse.ArgumentParser()
 parser.add_argument('filename')
@@ -28,29 +29,29 @@ if args.encoding == 'cp1251':
   letters = lowerLettersCp1251 | upperLettersCp1251
   up = upperLettersCp1251
 
-abbreviations = set()
 
-def isAbbr(upperLetterCount, length):
-  if length <= 4: return upperLetterCount == length
-  else: return upperLetterCount >= (length - 2)
+def scanFileContentAndExtractAbbreviations(content):
+  abbreviations = set()
+  counter = 0
+  upperLettersCounter = 0
+  curWord = []
+  for ch in content:
+    counter += 1
+    code = ch
+    if code in letters:
+      if code in up: upperLettersCounter += 1
+      curWord.append(ch)
+    else:
+      if upperLettersCounter >= 2 and isAbbr(upperLettersCounter, len(curWord)):
+        if args.encoding == 'utf8':
+          abbreviations.add(''.join(curWord))
+        else:
+          abbreviations.add(bytes(curWord))
+      curWord = []
+      upperLettersCounter = 0
+  return (counter, abbreviations)
 
-counter = 0
-upperLettersCounter = 0
-curWord = []
-for ch in content:
-  counter += 1
-  code = ch
-  if code in letters:
-    if code in up: upperLettersCounter += 1
-    curWord.append(ch)
-  else:
-    if upperLettersCounter >= 2 and isAbbr(upperLettersCounter, len(curWord)):
-      if args.encoding == 'utf8':
-        abbreviations.add(''.join(curWord))
-      else:
-        abbreviations.add(bytes(curWord))
-    curWord = []
-    upperLettersCounter = 0
+counter, abbreviations = scanFileContentAndExtractAbbreviations(content)
 
 sys.stderr.write(f'Total letters: {counter}\n')
 if args.encoding == 'utf8':
