@@ -1,3 +1,4 @@
-def isAbbr(upperLetterCount, length):
-  if length <= 4: return upperLetterCount == length
-  else: return upperLetterCount >= (length - 2)
+def isAbbr(upperLettersCounter, allLettesCount):
+   if upperLettersCounter < 2: return False
+   if allLettesCount <= 4: return upperLettersCounter == allLettesCount
+   else: return upperLettersCounter >= (allLettesCount - 2)

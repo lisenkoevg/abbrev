@@ -119,7 +119,7 @@ def handleOpts():
    parser.add_argument('-n', '--noWav', help='don\'t generate wav', action='store_true')
    parser.add_argument('-q', '--quiet', help='don\'t output modified text', action='store_true')
 #    parser.add_argument('-d', '--debug', help='show found abbreviations and modified text', action='store_true')
-   parser.add_argument('-o', '--outputFile', help='output wav-file name (default: out.wav)', default="out.wav")
+   parser.add_argument('-o', '--outputFile', help='output wav-file name (in current dir) (default: out.wav)', default="out.wav")
    args = parser.parse_args()
    if args.noWav and args.quiet:
       parser.print_help()

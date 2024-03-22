@@ -42,7 +42,7 @@ def scanFileContentAndExtractAbbreviations(content):
       if code in up: upperLettersCounter += 1
       curWord.append(ch)
     else:
-      if upperLettersCounter >= 2 and isAbbr(upperLettersCounter, len(curWord)):
+      if isAbbr(upperLettersCounter, len(curWord)):
         if args.encoding == 'utf8':
           abbreviations.add(''.join(curWord))
         else:
