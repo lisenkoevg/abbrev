@@ -21,8 +21,8 @@
 ```
 ```
 py textToWav.py --help
-usage: textToWav.py [-h] [-f N] [-t N] [-c N] [-m N] [-n | -q] [-d]
-                    [--excludeWithPymorphy] [-o wavFile]
+usage: textToWav.py [-h] [-f N] [-t N] [-c N] [-m N] [-n | -q] [-d] [-p]
+                    [-o wavFile]
                     inputFile
 
 positional arguments:
@@ -39,9 +39,9 @@ options:
   -n, --noWav           don't generate wav
   -q, --quiet           don't output modified text
   -d, --debug           show intermediate results
-  --excludeWithPymorphy
-                        filter out abbreviation candidate with pymorphy3
-                        "Abbr" and "Geox" tags False
+  -p, --excludeWithPymorphy
+                        filter out abbreviation candidates with pymorphy3 if
+                        "Abbr" and "Geox" tags is False
   -o wavFile, --outputFile wavFile
                         output wav-file name (in current dir) (default:
                         out.wav)
