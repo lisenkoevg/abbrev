@@ -9,7 +9,7 @@ def main():
    else:
       input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf8')
       content = input_stream.read()
-   content = content[args.fromChar:args.toChar].strip().replace('\n', '.\n')
+   content = content[args.fromChar:args.toChar].strip()
 
    abbrs, contentAsLetterList, contentAsWordList = extractAbbr(content)
    if args.debug:
@@ -56,17 +56,27 @@ def extractAbbr(content):
             curWord = []
             upperLettersCounter = 0
       pos += 1
+   if len(curWord) > 0:
+      if isAbbr(''.join(curWord), upperLettersCounter):
+         result.append({
+            'abbr': ''.join(curWord),
+            'pos': pos - len(curWord),
+            'posWord': posWord
+         })
+      contentAsWordList.append(''.join(curWord))
    return result, contentAsLetterList, contentAsWordList
 
 def modifyAbbr(abbrList):
    for ab in abbrList:
       ab['abbr_'] = vowelizeAbbr(ab['abbr'])
-#       ab['isPymorphyAbbr'] = isPymorphyAbbr(ab['abbr'])
+      ab['isPymorphyAbbr'] = isPymorphyAbbr(ab['abbr'])
    return abbrList
 
 def inlineModifiedAbbr(modifiedAbbreviations, contentAsLetterList):
+   global args
    shift = 0
    for ab in modifiedAbbreviations:
+      if args.excludeWithPymorphy and not ab['isPymorphyAbbr']: continue
       startPos = ab['pos'] + shift
       endPos = ab['pos'] + len(ab['abbr']) + shift
       contentAsLetterList[startPos:endPos] = list(ab['abbr_'])
@@ -77,9 +87,11 @@ def inlineModifiedAbbrContext(modifiedAbbreviations, contentAsWordList, contextW
    global args
    result = []
    for ab in modifiedAbbreviations:
+      if args.excludeWithPymorphy and not ab['isPymorphyAbbr']: continue
       p = ab['posWord']
       contentAsWordList[p] = ab['abbr_']
    for ab in modifiedAbbreviations:
+      if args.excludeWithPymorphy and not ab['isPymorphyAbbr']: continue
       p = ab['posWord']
       s = ab['abbr'] + ' ' if args.noWav else ''
       result.extend([s + '...'
@@ -140,16 +152,13 @@ def isAbbr(abbr, upperLettersCounter):
    if le < 2: return False
    if re.match('[A-Z]', abbr): return False
    if le <= 4:
-      return upperLettersCounter == le and isPymorphyAbbr(abbr)
+      return upperLettersCounter == le
    else:
-      return upperLettersCounter >= (le - 2) and isPymorphyAbbr(abbr)
+      return upperLettersCounter >= (le - 2)
 
 import pymorphy3
 morph = pymorphy3.MorphAnalyzer()
 def isPymorphyAbbr(abbr):
-   global args
-   if not args.excludeWithPymorphy:
-      return True
    # Некоторую часть абрревиатур pymorphy3 не распознаёт (сравн.
    # tests\textToWav\krasn_vesna.out
    # tests\textToWav\krasn_vesna_Excluded_by_PyMorph.out)
@@ -224,7 +233,7 @@ def handleOpts():
    group.add_argument('-n', '--noWav', help='don\'t generate wav', action='store_true')
    group.add_argument('-q', '--quiet', help='don\'t output modified text', action='store_true')
    parser.add_argument('-d', '--debug', help='show intermediate results', action='store_true')
-   parser.add_argument('--excludeWithPymorphy', help='filter out abbreviation candidate with pymorphy3 "Abbr" and "Geox" tags False', action='store_true')
+   parser.add_argument('-p', '--excludeWithPymorphy', help='filter out abbreviation candidates with pymorphy3 if "Abbr" and "Geox" tags is False', action='store_true')
    parser.add_argument('-o', '--outputFile', metavar="wavFile", help='output wav-file name (in current dir) (default: out.wav)', default="out.wav")
    args = parser.parse_args()
    if args.fromChar < 0 or int(args.toChar or 0) < 0 or args.fromChar > int(args.toChar or 0):
