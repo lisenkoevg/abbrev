@@ -3,7 +3,6 @@ import sys
 import io
 
 def main():
-   global args
    if args.inputFile != '-':
       content = open(args.inputFile, 'r', encoding='utf8').read()
    else:
@@ -73,7 +72,6 @@ def modifyAbbr(abbrList):
    return abbrList
 
 def inlineModifiedAbbr(modifiedAbbreviations, contentAsLetterList):
-   global args
    shift = 0
    for ab in modifiedAbbreviations:
       if args.excludeWithPymorphy and not ab['isPymorphyAbbr']: continue
@@ -84,14 +82,13 @@ def inlineModifiedAbbr(modifiedAbbreviations, contentAsLetterList):
    return ''.join(contentAsLetterList)
 
 def inlineModifiedAbbrContext(modifiedAbbreviations, contentAsWordList, contextWordNum):
-   global args
    result = []
+   if args.excludeWithPymorphy:
+      modifiedAbbreviations = [x for x in modifiedAbbreviations if x['isPymorphyAbbr']]
    for ab in modifiedAbbreviations:
-      if args.excludeWithPymorphy and not ab['isPymorphyAbbr']: continue
       p = ab['posWord']
       contentAsWordList[p] = ab['abbr_']
    for ab in modifiedAbbreviations:
-      if args.excludeWithPymorphy and not ab['isPymorphyAbbr']: continue
       p = ab['posWord']
       s = ab['abbr'] + ' ' if args.noWav else ''
       result.extend([s + '...'
@@ -106,12 +103,12 @@ def generateWav(text, audio_path):
    ts = str(time.time_ns())
    fragments = splitTextIntoFragments(text)
 
-   print("generating {} ({} chunks)...".format(audio_path, len(fragments)), end='', flush=True)
+   if not args.quiet: print("generating {} ({} chunks)...".format(audio_path, len(fragments)), end='', flush=True)
    for (i, text) in enumerate(fragments):
       f = audio_path.replace('.wav', f'_{i}_{ts}.wav')
       generateWav_(text, f)
-      print(f' {i+1}', end='', flush=True)
-   print()
+      if not args.quiet: print(f' {i+1}', end='', flush=True)
+   if not args.quiet: print()
    # combine wav-chunks
    wav = wave.open(audio_path, 'wb')
    for (i, text) in enumerate(fragments):
@@ -217,7 +214,6 @@ def splitTextIntoFragments(text):
       result.append(text[l:h])
    return result
 
-args = 0
 def handleOpts():
    global MAX_TEXT_LENGTH_FOR_TORCH
    global args
@@ -234,7 +230,7 @@ def handleOpts():
    group.add_argument('-q', '--quiet', help='don\'t output modified text', action='store_true')
    parser.add_argument('-d', '--debug', help='show intermediate results', action='store_true')
    parser.add_argument('-p', '--excludeWithPymorphy', help='filter out abbreviation candidates with pymorphy3 if "Abbr" and "Geox" tags is False', action='store_true')
-   parser.add_argument('-o', '--outputFile', metavar="wavFile", help='output wav-file name (in current dir) (default: out.wav)', default="out.wav")
+   parser.add_argument('-o', '--outputFile', metavar="wavFile", help='output wav-file name (dir must exists if specified) (default: out.wav)', default="out.wav")
    args = parser.parse_args()
    if args.fromChar < 0 or int(args.toChar or 0) < 0 or args.fromChar > int(args.toChar or 0):
       print('incorrect --fromChar/--toChar')
