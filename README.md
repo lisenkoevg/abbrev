@@ -1,4 +1,3 @@
-
 ## Попытка научить pytorch нормально произносить русские аббревиатуры.
 ```
 АООТ|акционерное общество открытого типа
@@ -20,7 +19,7 @@
 ВэААПэП+э.|Всероссийская ассоциация пролетарских писателей
 ```
 ```
-py textToWav.py --help
+$ py textToWav.py --help
 usage: textToWav.py [-h] [-f N] [-t N] [-c N] [-m N] [-n | -q] [-d] [-p]
                     [-o wavFile]
                     inputFile
@@ -43,6 +42,7 @@ options:
                         filter out abbreviation candidates with pymorphy3 if
                         "Abbr" and "Geox" tags is False
   -o wavFile, --outputFile wavFile
-                        output wav-file name (in current dir) (default:
-                        out.wav)
+                        output wav-file name (dir must exists if specified)
+                        (default: out.wav)
+
 ```
