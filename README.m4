@@ -1,9 +1,7 @@
-define(`_help_cmd', `py textToWav.py --help')dnl
-changequote(`"', `"')dnl
-define("_backtick", "```")dnl
-changequote()dnl
+changequote([[,]])dnl
+define([[_help_cmd]], [[py textToWav.py --help]])dnl
 ## Попытка научить pytorch нормально произносить русские аббревиатуры.
-_backtick
+```
 АООТ|акционерное общество открытого типа
 АОР|архив Октябрьской революции
 АТД|административно-территориальное деление
@@ -21,8 +19,8 @@ _backtick
 БэД+э.|база данных
 БэУ.|бюджетное учреждение
 ВэААПэП+э.|Всероссийская ассоциация пролетарских писателей
-_backtick
-_backtick
+```
+```
 $ _help_cmd
 esyscmd(_help_cmd)
-_backtick
+```
