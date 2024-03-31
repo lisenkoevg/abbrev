@@ -1,6 +1,7 @@
 import os
 import sys
 import io
+import re
 
 def main():
    if args.inputFile != '-':
@@ -11,19 +12,19 @@ def main():
    content = content[args.fromChar:args.toChar].strip()
 
    abbrs, contentAsLetterList, contentAsWordList = extractAbbr(content)
-   if args.debug:
-      print('{}\n'.format(content))
-      print('{}\n'.format(contentAsWordList))
-      for x in abbrs: print(x)
-      print()
+#    if args.debug:
+#       print('{}\n'.format(content))
+#       print('{}\n'.format(contentAsWordList))
+#       for x in abbrs: print(x)
+#       print()
    modifiedAbbr = modifyAbbr(abbrs)
    if args.debug:
       for x in modifiedAbbr: print(x)
       print()
-   if args.context == 0:
+   if args.context == None:
       modifiedContent = inlineModifiedAbbr(modifiedAbbr, contentAsLetterList)
    else:
-      modifiedContent = inlineModifiedAbbrContext(modifiedAbbr, contentAsWordList, args.context)
+      modifiedContent = inlineModifiedAbbrContext(modifiedAbbr, contentAsWordList)
    if not args.quiet:
       print(modifiedContent)
    if not args.noWav:
@@ -44,13 +45,14 @@ def extractAbbr(content):
          curWord.append(ch)
       else:
          if len(curWord) > 0:
+            strWord = ''.join(curWord)
             if isAbbr(''.join(curWord), upperLettersCounter):
                result.append({
-                  'abbr': ''.join(curWord),
+                  'abbr': strWord,
                   'pos': pos - len(curWord),
                   'posWord': posWord
                })
-            contentAsWordList.append(''.join(curWord))
+            contentAsWordList.append(strWord)
             posWord += 1
             curWord = []
             upperLettersCounter = 0
@@ -68,7 +70,7 @@ def extractAbbr(content):
 def modifyAbbr(abbrList):
    for ab in abbrList:
       ab['abbr_'] = vowelizeAbbr(ab['abbr'])
-      ab['isPymorphyAbbr'] = isPymorphyAbbr(ab['abbr'])
+      ab['isPymorphyAbbr'], ab['pymorph'] = isPymorphyAbbr(ab['abbr'])
    return abbrList
 
 def inlineModifiedAbbr(modifiedAbbreviations, contentAsLetterList):
@@ -81,18 +83,22 @@ def inlineModifiedAbbr(modifiedAbbreviations, contentAsLetterList):
       shift += (len(ab['abbr_']) - len(ab['abbr']))
    return ''.join(contentAsLetterList)
 
-def inlineModifiedAbbrContext(modifiedAbbreviations, contentAsWordList, contextWordNum):
+def inlineModifiedAbbrContext(modifiedAbbreviations, contentAsWordList):
    result = []
+   uniq = set()
    if args.excludeWithPymorphy:
       modifiedAbbreviations = [x for x in modifiedAbbreviations if x['isPymorphyAbbr']]
    for ab in modifiedAbbreviations:
       p = ab['posWord']
       contentAsWordList[p] = ab['abbr_']
    for ab in modifiedAbbreviations:
+      if not args.context == None:
+         if (ab['abbr'] in uniq): continue
+         uniq.add(ab['abbr'])
       p = ab['posWord']
       s = ab['abbr'] + ' ' if args.noWav else ''
       result.extend([s + '...'
-         + ' '.join(contentAsWordList[p - contextWordNum:p + contextWordNum + 1])
+         + ' '.join(contentAsWordList[p - args.context:p + args.context + 1])
          + '...\n'])
    return ''.join(result)
 
@@ -144,7 +150,6 @@ def generateWav_(text, audio_path):
       sample_rate=sample_rate)
 
 def isAbbr(abbr, upperLettersCounter):
-   import re
    le = len(abbr)
    if le < 2: return False
    if re.match('[A-Z]', abbr): return False
@@ -163,31 +168,61 @@ def isPymorphyAbbr(abbr):
    # >>> pymorphy3.MorphAnalyzer().parse('СССР')[0].tag => OpencorporaTag('NOUN,inan,masc,Sgtm,Fixd,Abbr,Geox sing,gent')
    # >>> pymorphy3.MorphAnalyzer().parse('ГДР')[0].tag => OpencorporaTag('NOUN,inan,femn,Fixd,Geox sing,gent')
    mo = morph.parse(abbr)[0]
-   return 'Abbr' in mo.tag or 'Geox' in mo.tag
+   return ('Abbr' in mo.tag or 'Geox' in mo.tag, mo.tag)
 
-cache = {}
 def vowelizeAbbr(abbr):
-   if abbr in cache: return cache[abbr]
+   result = ''
+   VOWELS = 'АЕИОУЭЮЯ'
+   vowel = f'[{VOWELS}]'
+   consonant = f'[^{VOWELS}]'
+
+   abbrLen = len(abbr)
+   maOnlyConsonants = re.search(f'^{consonant}+$', abbr)
+   maThreeOrMoreConsonants = not maOnlyConsonants and re.search(f'{consonant}{{3,}}', abbr)
+   maVowelsInside = not maThreeOrMoreConsonants and re.search(f'^{consonant}.*{vowel}.*{consonant}$', abbr)
+   maVowelConsonantInterchanges = not maVowelsInside and re.search(f'^(({consonant}{vowel})+|({vowel}{consonant})+)$', abbr)
+   maVowelFromTheSide = not maVowelConsonantInterchanges and re.search(f'^{vowel}|{vowel}$', abbr)
+#    print(abbr, f'\n{maOnlyConsonants=}\n{maThreeOrMoreConsonants=}\n{maVowelsInside=}\n{maVowelConsonantInterchanges=}\n{maVowelFromTheSide=}')
+   if maOnlyConsonants: # print('Только согласные', maOnlyConsonants)
+      result = vowelizeAbbrLetters(abbr)
+   elif maThreeOrMoreConsonants: # print('Три и более согласных подряд')
+      span = maThreeOrMoreConsonants.span()
+      result = ''.join([
+         abbr[0:span[0]],
+         vowelizeAbbrLetters(abbr[span[0]:span[1]]),
+         abbr[span[1]:]
+      ])
+   elif maVowelConsonantInterchanges: # print('Гласные чередуются с согласными')
+      result = abbr
+   elif maVowelsInside: # print('Гласные "внутри"')
+      result = abbr
+   elif maVowelFromTheSide: # print('Начинается или заканчивается с гласной')
+      ma = re.search(f'{consonant}+', abbr)
+      span = ma and ma.span()
+      if span and span[1] - span[0] == 1:
+         result = abbr
+      else:
+         result = vowelizeAbbrLetters(abbr)
+   return result
+
+def vowelizeAbbrLetters(abbr):
+   postE = 'БВГДЖЗПТЦЧ'
+   preE = 'ЛМНРСФ'
+   postA = 'К'
+
    abbrLen = len(abbr)
    li = []
    i = 0
    while i < len(abbr):
-      li.append(vowelizeAbbrLetter(abbr[i], i == len(abbr) - 1))
+      isLast = (i == abbrLen - 1)
+      x = abbr[i]
+      stress = '+' if isLast else ''
+      if postE.find(x) >= 0: x = f'{x}{stress}э'
+      elif preE.find(x) >= 0: x = f'{stress}э{x}'
+      elif postA.find(x) >= 0: x = f'{x}{stress}' + 'а' * 1
+      li.append(x)
       i += 1
-   cache[abbr] = ''.join(li)
-   return cache[abbr]
-
-def vowelizeAbbrLetter(x, isLast):
-   postE = 'БВГДПТЦЧ'
-   preE = 'ЛМНРСФ'
-   postA = 'К'
-   twice = 'ОАИ'
-   stress = '+' if isLast else ''
-   if postE.find(x) >= 0: x = f'{x}{stress}э'
-   elif preE.find(x) >= 0: x = f'{stress}э{x}'
-   elif postA.find(x) >= 0: x = f'{x}{stress}' + 'а' * 1
-   elif twice.find(x) >= 0: x = f'{x}{stress}{x.upper() * 1}'
-   return x + ('.' if isLast else '')
+   return ''.join(li)
 
 MAX_TEXT_LENGTH_FOR_TORCH = 800
 def splitTextIntoFragments(text):
@@ -222,7 +257,7 @@ def handleOpts():
    parser.add_argument('inputFile', help='input text file (utf-8 encoded), "-" - read from stdin')
    parser.add_argument('-f', '--fromChar', metavar='N', help='process input starting from char N (default: 0)', type=int, default=0)
    parser.add_argument('-t', '--toChar', metavar='N', help='process input till char N (default: text length)', type=int, default=None)
-   parser.add_argument('-c', '--context', metavar='N', help='process only N words before and after each abbreviation', type=int, default=0)
+   parser.add_argument('-c', '--context', metavar='N', help='process only N words before and after each abbreviation', type=int, default=None)
    parser.add_argument('-m', '--maxChunkLength', metavar='N',
       help=f'max text chunk length for "torch" input (default {MAX_TEXT_LENGTH_FOR_TORCH})', type=int, default=MAX_TEXT_LENGTH_FOR_TORCH)
    group = parser.add_mutually_exclusive_group()
