@@ -2,8 +2,12 @@ import os
 import sys
 import io
 import re
+import json
+
+abbrStoreFile = 'abbrStore.json'
 
 def main():
+   abbrStore = loadAbbrStore()
    if args.inputFile != '-':
       inputStream = open(args.inputFile, 'r', encoding='utf8')
    else:
@@ -27,6 +31,23 @@ def main():
       print(modifiedContent)
    if not args.noWav:
       generateWav(modifiedContent, args.outputFile)
+   saveAbbrStore(abbrStore, modifiedAbbr)
+
+def loadAbbrStore():
+   result = dict()
+   if os.path.isfile(abbrStoreFile):
+      result = json.loads(open(abbrStoreFile, encoding='utf8').read())
+   return result
+
+def saveAbbrStore(abbrStore, modifiedAbbr):
+   modified = False
+   for x in modifiedAbbr:
+      if x['abbr'] in abbrStore: continue
+      abbrStore[x['abbr']] = x['abbr_'] + ' | ' + str(x['pymorph'])
+      modified = True
+   if modified:
+      j = json.dumps(abbrStore, sort_keys=True, ensure_ascii=False, indent=2)
+      open(abbrStoreFile, mode='w', encoding='utf8').write(j)
 
 def extractAbbr(inputStream):
    result = []
@@ -270,9 +291,7 @@ def handleOpts():
    parser.add_argument('-p', '--excludeWithPymorphy', help='filter out abbreviation candidates with pymorphy3 if "Abbr" and "Geox" tags is False', action='store_true')
    parser.add_argument('-o', '--outputFile', metavar="wavFile", help='output wav-file name (dir must exists if specified) (default: out.wav)', default="out.wav")
    args = parser.parse_args()
-   fr = int(args.fromChar or 0)
-   to = int(args.toChar or 0)
-   if fr < 0 or to < 1 or fr > to - 1:
+   if 0 == len(range(int(args.fromChar or 0), int(args.toChar or sys.maxsize))):
       print('incorrect --fromChar/--toChar')
       exit(1)
    if 10 <= args.maxChunkLength <= 2000:
