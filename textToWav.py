@@ -5,13 +5,11 @@ import re
 
 def main():
    if args.inputFile != '-':
-      content = open(args.inputFile, 'r', encoding='utf8').read()
+      inputStream = open(args.inputFile, 'r', encoding='utf8')
    else:
-      input_stream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf8')
-      content = input_stream.read()
-   content = content[args.fromChar:args.toChar].strip()
+      inputStream = io.TextIOWrapper(sys.stdin.buffer, encoding='utf8')
 
-   abbrs, contentAsLetterList, contentAsWordList = extractAbbr(content)
+   abbrs, contentAsLetterList, contentAsWordList = extractAbbr(inputStream)
 #    if args.debug:
 #       print('{}\n'.format(content))
 #       print('{}\n'.format(contentAsWordList))
@@ -30,7 +28,7 @@ def main():
    if not args.noWav:
       generateWav(modifiedContent, args.outputFile)
 
-def extractAbbr(content):
+def extractAbbr(inputStream):
    result = []
    contentAsLetterList = []
    contentAsWordList = []
@@ -38,25 +36,30 @@ def extractAbbr(content):
    posWord = 0
    upperLettersCounter = 0
    curWord = []
-   for ch in content:
-      contentAsLetterList.append(ch)
-      if ch.isalpha():
-         if ch.isupper(): upperLettersCounter += 1
-         curWord.append(ch)
-      else:
-         if len(curWord) > 0:
-            strWord = ''.join(curWord)
-            if isAbbr(''.join(curWord), upperLettersCounter):
-               result.append({
-                  'abbr': strWord,
-                  'pos': pos - len(curWord),
-                  'posWord': posWord
-               })
-            contentAsWordList.append(strWord)
-            posWord += 1
-            curWord = []
-            upperLettersCounter = 0
-      pos += 1
+   isEnd = False
+   for line in inputStream:
+      if isEnd: break
+      for ch in line:
+         if not args.fromChar == None and pos < int(args.fromChar or 0): pos += 1; continue
+         if not args.toChar == None and pos == int(args.toChar or 0): isEnd = True; break
+         contentAsLetterList.append(ch)
+         if ch.isalpha():
+            if ch.isupper(): upperLettersCounter += 1
+            curWord.append(ch)
+         else:
+            if len(curWord) > 0:
+               strWord = ''.join(curWord)
+               if isAbbr(''.join(curWord), upperLettersCounter):
+                  result.append({
+                     'abbr': strWord,
+                     'pos': pos - len(curWord),
+                     'posWord': posWord
+                  })
+               contentAsWordList.append(strWord)
+               posWord += 1
+               curWord = []
+               upperLettersCounter = 0
+         pos += 1
    if len(curWord) > 0:
       if isAbbr(''.join(curWord), upperLettersCounter):
          result.append({
@@ -255,7 +258,7 @@ def handleOpts():
    import argparse
    parser = argparse.ArgumentParser()
    parser.add_argument('inputFile', help='input text file (utf-8 encoded), "-" - read from stdin')
-   parser.add_argument('-f', '--fromChar', metavar='N', help='process input starting from char N (default: 0)', type=int, default=0)
+   parser.add_argument('-f', '--fromChar', metavar='N', help='process input starting from char N', type=int, default=None)
    parser.add_argument('-t', '--toChar', metavar='N', help='process input till char N (default: text length)', type=int, default=None)
    parser.add_argument('-c', '--context', metavar='N', help='process only N words before and after each abbreviation', type=int, default=None)
    parser.add_argument('-m', '--maxChunkLength', metavar='N',
@@ -267,7 +270,9 @@ def handleOpts():
    parser.add_argument('-p', '--excludeWithPymorphy', help='filter out abbreviation candidates with pymorphy3 if "Abbr" and "Geox" tags is False', action='store_true')
    parser.add_argument('-o', '--outputFile', metavar="wavFile", help='output wav-file name (dir must exists if specified) (default: out.wav)', default="out.wav")
    args = parser.parse_args()
-   if args.fromChar < 0 or int(args.toChar or 0) < 0 or args.fromChar > int(args.toChar or 0):
+   fr = int(args.fromChar or 0)
+   to = int(args.toChar or 0)
+   if fr < 0 or to < 1 or fr > to - 1:
       print('incorrect --fromChar/--toChar')
       exit(1)
    if 10 <= args.maxChunkLength <= 2000:

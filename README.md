@@ -29,7 +29,7 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -f N, --fromChar N    process input starting from char N (default: 0)
+  -f N, --fromChar N    process input starting from char N
   -t N, --toChar N      process input till char N (default: text length)
   -c N, --context N     process only N words before and after each
                         abbreviation
