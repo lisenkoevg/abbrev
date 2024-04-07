@@ -7,7 +7,7 @@ function main() {
   [ -n "$_TIME" ] && _time=time
 
   RC=
-  testProg textToWav 'py $prog.py -n $testInput -c 3'
+  testProg textToWav 'py $prog/$prog.py -n $testInput -c 3'
 #   [ -z "$RC" ] && beep 3000 50
 
 #   RC=

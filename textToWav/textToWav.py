@@ -3,6 +3,7 @@ import sys
 import io
 import re
 import json
+import abbrGramota
 
 abbrStoreFile = 'abbrStore.json'
 
@@ -93,7 +94,8 @@ def extractAbbr(inputStream):
 
 def modifyAbbr(abbrList):
    for ab in abbrList:
-      ab['abbr_'] = vowelizeAbbr(ab['abbr'])
+      g = abbrGramota.main(ab['abbr'])
+      ab['abbr_'] = g or vowelizeAbbr(ab['abbr'])
       ab['isPymorphyAbbr'], ab['pymorph'] = isPymorphyAbbr(ab['abbr'])
    return abbrList
 
