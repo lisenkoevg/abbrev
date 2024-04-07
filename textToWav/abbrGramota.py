@@ -95,7 +95,7 @@ def parseAbbr(abbr):
    htmlStr = loadTmp(tmpFile)
    if not htmlStr:
       link = SEARCH_LINK + abbr
-      print('request {}'.format(link), flush=True)
+      print('request {}'.format(link), flush=True, end='\n' if verbose else ' ')
       r = requests.get(link)
       htmlStr = r.text
       writeTmp(tmpFile, '', htmlStr)
@@ -106,6 +106,7 @@ def parseAbbr(abbr):
       ma = re.search('<div class="nothing-found">', htmlStr)
       if ma:
          if verbose: print('abbr not found in selected dictionaries')
+         print(result)
          return result
    dictionary = ma.group(1).strip()
    writeTmp(tmpFile, 'dictionary-part', dictionary)
@@ -134,6 +135,7 @@ def parseAbbr(abbr):
                break
       else:
          if verbose: print('abbreviation parse error for slovar ' + id)
-
+   print(result)
    return result
-print(main(sys.argv[1], v=True))
+
+# print(main(sys.argv[1], v=True))

@@ -20,13 +20,6 @@
 ```
 ```
 $ py textToWav/textToWav.py --help
-request https://gramota.ru/poisk?mode=slovari&simple=1&dicts[]=27&dicts[]=71&query=--help
-div dictionary-part not found
-abbr not found in selected dictionaries
---help => [{'27': '', '71': ''}]
-adding attrib saveSlovar.changed
-saving slovar
-
 usage: textToWav.py [-h] [-f N] [-t N] [-c N] [-m N] [-n | -q] [-d] [-p]
                     [-o wavFile]
                     inputFile
