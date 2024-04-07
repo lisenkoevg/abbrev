@@ -1,5 +1,5 @@
 changequote([[,]])dnl
-define([[_help_cmd]], [[py textToWav.py --help]])dnl
+define([[_help_cmd]], [[py textToWav/textToWav.py --help]])dnl
 ## Попытка научить pytorch нормально произносить русские аббревиатуры.
 ```
 АООТ|акционерное общество открытого типа
